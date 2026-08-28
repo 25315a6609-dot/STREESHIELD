@@ -1,0 +1,49 @@
+============================================
+          STREESHIELD DATASET REPORT
+============================================
+
+Dataset location: D:\STREESHIELD_Dataset
+
+1. DATASET TOTALS
+--------------------------------------------
+Total images     : 2800
+Valid images     : 2800
+Corrupted images : 0
+
+2. CLASS BALANCE
+--------------------------------------------
+TRAIN
+  REAL : 1000
+  FAKE : 1000
+  Status : BALANCED
+
+VALID
+  REAL : 200
+  FAKE : 200
+  Status : BALANCED
+
+TEST
+  REAL : 200
+  FAKE : 200
+  Status : BALANCED
+
+3. IMAGE FORMATS
+--------------------------------------------
+JPEG : 2800
+
+4. IMAGE DIMENSIONS
+--------------------------------------------
+256 x 256 : 2800
+
+5. EXACT-DUPLICATE LEAKAGE CHECK
+--------------------------------------------
+Total images checked : 2800
+Unique image hashes  : 2800
+Duplicate groups     : 0
+Status : PASSED
+
+6. OVERALL STATUS
+--------------------------------------------
+Dataset validation : PASSED
+
+============================================

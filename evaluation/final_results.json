@@ -1,0 +1,51 @@
+{
+    "model": {
+        "name": "Basic CNN",
+        "input_shape": "128x128x3",
+        "optimizer": "Adam",
+        "loss": "Binary Crossentropy",
+        "output_activation": "Sigmoid",
+        "trained_model": "E:\\streesheild\\models\\trained_basic_cnn.keras"
+    },
+    "training": {
+        "epochs": 10,
+        "final_training_accuracy": 0.7754173278808594,
+        "final_validation_accuracy": 0.6818181872367859,
+        "final_training_loss": 0.4701881408691406,
+        "final_validation_loss": 0.64841228723526
+    },
+    "test": {
+        "test_accuracy": 0.6734,
+        "test_loss": 0.6455
+    },
+    "metrics": {
+        "accuracy": 0.6734,
+        "precision": 0.6944,
+        "recall": 0.625,
+        "f1_score": 0.6579,
+        "roc_auc": 0.7407
+    },
+    "confusion_matrix": {
+        "true_negative": 143,
+        "false_positive": 55,
+        "false_negative": 75,
+        "true_positive": 125
+    },
+    "dataset": {
+        "train_real": 980,
+        "train_fake": 997,
+        "valid_real": 196,
+        "valid_fake": 200,
+        "test_real": 198,
+        "test_fake": 200,
+        "total_processed_images": 2771,
+        "image_size": "128x128",
+        "image_format": "JPEG"
+    },
+    "files": {
+        "training_history": "E:\\streesheild\\training\\training_history.json",
+        "predictions": "E:\\streesheild\\evaluation\\test_predictions.csv",
+        "confusion_matrix": "E:\\streesheild\\evaluation\\confusion_matrix.png",
+        "trained_model": "E:\\streesheild\\models\\trained_basic_cnn.keras"
+    }
+}

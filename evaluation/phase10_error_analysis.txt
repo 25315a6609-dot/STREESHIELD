@@ -1,0 +1,35 @@
+PHASE 10F — ERROR ANALYSIS
+
+BASIC CNN
+TN = 143
+FP = 55
+FN = 75
+TP = 125
+
+3D CNN
+TN = 0
+FP = 10
+FN = 0
+TP = 10
+
+BASIC CNN:
+False positives occur when REAL images are classified as FAKE.
+Possible causes include compression artifacts, lighting,
+blur, unusual facial characteristics, and input-distribution
+differences.
+
+False negatives occur when FAKE images are classified as REAL.
+Possible causes include high-quality manipulations and the lack
+of temporal information in single-image analysis.
+
+3D CNN:
+The model classified every test sequence as FAKE.
+This creates 10 false positives and 0 false negatives.
+The behavior indicates strong bias toward the FAKE class and
+poor generalization from the small video training dataset.
+
+OVERALL:
+The Basic CNN provides a more balanced error pattern.
+The 3D CNN requires more diverse video sequences and further
+training improvements before it can become a reliable temporal
+deepfake detector.

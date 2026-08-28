@@ -1,0 +1,6 @@
+Metric,Basic CNN,3D CNN,Winner
+Accuracy,0.6734,0.5,Basic CNN
+Precision,0.6944,0.5,Basic CNN
+Recall,0.625,1.0,3D CNN
+F1-score,0.6579,0.6667,3D CNN
+ROC-AUC,0.7407,0.47,Basic CNN

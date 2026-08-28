@@ -1,0 +1,24 @@
+PHASE 8G — RESULTS ANALYSIS
+
+Overall baseline winner: Basic CNN
+
+Basic CNN:
+Accuracy: 67.34%
+Precision: 69.44%
+Recall: 62.50%
+F1-score: 65.79%
+ROC-AUC: 74.07%
+
+3D CNN:
+Accuracy: 50.00%
+Precision: 50.00%
+Recall: 100.00%
+F1-score: 66.67%
+ROC-AUC: 47.00%
+
+Basic CNN metric wins: 3
+3D CNN metric wins: 2
+
+The Basic CNN is the stronger baseline in this experiment.
+The 3D CNN has temporal modeling capability but generalized poorly
+on the small video-sequence test set.

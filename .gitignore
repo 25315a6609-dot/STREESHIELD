@@ -1,0 +1,35 @@
+# Virtual environment
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+
+# Model files - keep trained models local
+models/*.keras
+app/models/*.keras
+
+# Dataset files - keep datasets local
+dataset/**
+processed/**
+
+# Temporary video files
+temp_*.mp4
+
+# OS / IDE
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+# Local application backups
+app/app_backup.py
+app/app_backup_before_13D.py
+
+# Duplicate presentation files
+presentation/*.odt

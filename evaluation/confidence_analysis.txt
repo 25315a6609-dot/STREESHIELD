@@ -1,0 +1,28 @@
+Basic CNN
+Total predictions: 398
+REAL predictions: 218
+FAKE predictions: 180
+Average confidence: 75.26%
+Minimum confidence: 50.28%
+Maximum confidence: 99.98%
+Average REAL confidence: 76.61%
+Average FAKE confidence: 73.62%
+Correct prediction confidence: 77.67%
+Incorrect prediction confidence: 70.29%
+Correct predictions: 268
+Incorrect predictions: 130
+
+3D CNN
+Total predictions: 20
+REAL predictions: 0
+FAKE predictions: 20
+Average confidence: 50.10%
+Minimum confidence: 50.07%
+Maximum confidence: 50.14%
+Average REAL confidence: 0.00%
+Average FAKE confidence: 50.10%
+Correct prediction confidence: 50.10%
+Incorrect prediction confidence: 50.10%
+Correct predictions: 10
+Incorrect predictions: 10
+
