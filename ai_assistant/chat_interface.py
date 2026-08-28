@@ -1,324 +1,250 @@
-"""
-STREESHIELD AI ASSISTANT
-Phase 13D
-
-Clean Streamlit-native chat interface.
-
-This file intentionally does NOT use:
-- HTML <div> elements
-- SVG links
-- raw HTML rendering
-- unsafe_allow_html=True
-
-The interface uses only Streamlit components so that
-HTML source code can never appear on the screen.
-"""
-
 import streamlit as st
 
-
-# ============================================================
-# ASSISTANT KNOWLEDGE BASE
-# ============================================================
-
-KNOWLEDGE_BASE = {
-
-    "streeshield": (
-        "STREESHIELD is an AI-powered deepfake detection system "
-        "that analyzes images and videos using deep learning, "
-        "computer vision, AI analysis and risk assessment."
-    ),
-
-    "basic cnn": (
-        "The Basic CNN is the image-based deepfake detection model. "
-        "It receives a processed 128x128 RGB face image and produces "
-        "a binary prediction for REAL or FAKE."
-    ),
-
-    "3d cnn": (
-        "The 3D CNN is the video-based model. It analyzes a sequence "
-        "of 16 face frames with shape 16x128x128x3 and is designed "
-        "to learn both spatial and temporal information."
-    ),
-
-    "face detection": (
-        "STREESHIELD uses OpenCV face detection before image analysis. "
-        "For an image, the largest detected face is cropped, resized "
-        "to 128x128 pixels and normalized before being sent to the CNN."
-    ),
-
-    "preprocessing": (
-        "Image preprocessing converts the image to RGB, resizes the "
-        "face to 128x128 pixels and normalizes pixel values to the "
-        "range 0 to 1."
-    ),
-
-    "confidence": (
-        "Confidence indicates how strongly the model supports its "
-        "prediction. A confidence close to 50 percent indicates "
-        "greater uncertainty."
-    ),
-
-    "real": (
-        "REAL means the model classified the uploaded media as "
-        "more likely to be authentic according to its learned patterns."
-    ),
-
-    "fake": (
-        "FAKE means the model classified the uploaded media as "
-        "more likely to contain manipulated or synthetic content."
-    ),
-
-    "opencv": (
-        "OpenCV is used for computer-vision operations such as "
-        "reading images and videos, converting color spaces, "
-        "detecting faces and preparing image data."
-    ),
-
-    "risk": (
-        "Risk assessment converts the model prediction and confidence "
-        "into a risk category such as LOW, MEDIUM or HIGH."
-    ),
-
-    "report": (
-        "The AI report summarizes the detection type, model used, "
-        "prediction, confidence and AI explanation."
-    ),
-
-    "video": (
-        "In video mode, STREESHIELD processes the uploaded video, "
-        "detects faces, creates a 16-frame sequence and sends the "
-        "sequence to the 3D CNN."
-    ),
-
-    "image": (
-        "In image mode, STREESHIELD detects the largest face, "
-        "preprocesses it into a 128x128 RGB image and sends it "
-        "to the Basic CNN."
-    ),
-
-    "limitations": (
-        "Deepfake detection is not perfect. Image quality, lighting, "
-        "compression, unusual facial characteristics and differences "
-        "between training and real-world data can affect predictions."
-    ),
-
-    "methodology": (
-        "The STREESHIELD workflow is: upload media, preprocess the "
-        "input, run the appropriate CNN model, obtain REAL/FAKE "
-        "prediction and confidence, perform AI analysis, calculate "
-        "risk and generate a report."
-    ),
-
-    "cnn": (
-        "CNN stands for Convolutional Neural Network. It is commonly "
-        "used for image analysis because convolutional layers can "
-        "learn visual patterns such as edges, textures and facial "
-        "features."
-    ),
-
-    "temporal": (
-        "Temporal analysis means analyzing information across multiple "
-        "video frames. The 3D CNN uses a 16-frame sequence to learn "
-        "spatial and temporal patterns."
-    ),
-}
+from openai_assistant import (
+    OpenAISTREESHIELDAssistant
+)
 
 
-# ============================================================
-# FIND ANSWER
-# ============================================================
+# ==================================================
+# CHAT INTERFACE
+# ==================================================
 
-def get_assistant_response(question):
+def render_chat(
+    detection_context=None
+):
     """
-    Generate a simple project-specific response.
+    Render the STREESHIELD AI Assistant.
 
-    The function intentionally returns plain text only.
-    No HTML or SVG is generated.
+    detection_context can contain the current
+    image/video prediction, confidence, model,
+    and risk information.
     """
 
-    question = question.strip().lower()
+    st.subheader(
+        "🧠 STREESHIELD AI Assistant"
+    )
 
-    if not question:
-        return (
-            "Please enter a question about STREESHIELD, "
-            "deepfake detection, CNN, 3D CNN, preprocessing "
-            "or the project methodology."
-        )
-
-    # Direct keyword matching
-    for keyword, response in KNOWLEDGE_BASE.items():
-
-        if keyword in question:
-
-            return response
-
-    # Additional question patterns
-
-    if "how does" in question and "work" in question:
-
-        return (
-            "STREESHIELD works by accepting an image or video, "
-            "preprocessing the input, running the appropriate "
-            "deep learning model, calculating confidence, "
-            "performing AI analysis and generating a risk assessment "
-            "and report."
-        )
-
-    if "which model" in question:
-
-        return (
-            "STREESHIELD uses two main models. Basic CNN is used "
-            "for image detection and 3D CNN is used for video "
-            "sequence detection."
-        )
-
-    if "difference" in question and "cnn" in question:
-
-        return (
-            "The Basic CNN analyzes a single 128x128 face image. "
-            "The 3D CNN analyzes 16 consecutive 128x128 face frames "
-            "and can learn temporal information from the sequence."
-        )
-
-    if "why" in question and "face" in question:
-
-        return (
-            "Face preprocessing helps the model focus on the facial "
-            "region instead of unrelated background information."
-        )
-
-    if "phase 13d" in question:
-
-        return (
-            "Phase 13D integrates the existing detection pipeline "
-            "with AI analysis, risk assessment, AI reports and the "
-            "STREESHIELD AI Assistant."
-        )
-
-    return (
-        "I can help with STREESHIELD, deepfake detection, "
-        "Basic CNN, 3D CNN, face detection, preprocessing, "
-        "confidence scores, OpenCV, risk assessment, reports "
-        "and project methodology."
+    st.caption(
+        "Ask about your detection result, deepfakes, "
+        "CNN, 3D CNN, OpenCV, confidence, or "
+        "STREESHIELD."
     )
 
 
-# ============================================================
-# ASSISTANT HEADER
-# ============================================================
+    # ==================================================
+    # SESSION STATE
+    # ==================================================
 
-def render_chat():
+    if "ai_chat_history" not in st.session_state:
 
-    st.markdown("## 🤖 STREESHIELD AI Assistant")
+        st.session_state.ai_chat_history = []
 
-    st.write(
-        "Ask questions about deepfake detection, CNN, 3D CNN, "
-        "confidence scores, preprocessing, OpenCV, or the "
-        "STREESHIELD project."
+
+    # ==================================================
+    # CURRENT DETECTION CONTEXT
+    # ==================================================
+
+    if detection_context:
+
+        st.info(
+            "Current detection: "
+            f"{detection_context.get('prediction', 'N/A')} • "
+            f"{detection_context.get('confidence', 0):.2f}% "
+            "confidence • "
+            f"{detection_context.get('model', 'N/A')} • "
+            f"{detection_context.get('media_type', 'N/A')}"
+        )
+
+
+    # ==================================================
+    # SUGGESTED QUESTIONS
+    # ==================================================
+
+    st.markdown(
+        "#### Suggested Questions"
     )
+
+    q1, q2, q3, q4 = st.columns(4)
+
+
+    with q1:
+
+        st.button(
+            "What is CNN?",
+            use_container_width=True,
+            key="suggest_cnn",
+            disabled=True
+        )
+
+
+    with q2:
+
+        st.button(
+            "What does confidence mean?",
+            use_container_width=True,
+            key="suggest_confidence",
+            disabled=True
+        )
+
+
+    with q3:
+
+        st.button(
+            "How does 3D CNN work?",
+            use_container_width=True,
+            key="suggest_3dcnn",
+            disabled=True
+        )
+
+
+    with q4:
+
+        st.button(
+            "Why was it classified this way?",
+            use_container_width=True,
+            key="suggest_prediction",
+            disabled=True
+        )
+
 
     st.divider()
 
-    # ========================================================
-    # SESSION STATE
-    # ========================================================
 
-    if "streeshield_chat_messages" not in st.session_state:
-
-        st.session_state.streeshield_chat_messages = [
-
-            {
-                "role": "assistant",
-                "content": (
-                    "Hello! 👋 I am the STREESHIELD AI Assistant. "
-                    "Ask me about deepfake detection, Basic CNN, "
-                    "3D CNN, preprocessing, confidence scores, "
-                    "risk assessment or the project methodology."
-                )
-            }
-
-        ]
-
-    # ========================================================
+    # ==================================================
     # DISPLAY CHAT HISTORY
-    # ========================================================
+    # ==================================================
 
-    for message in st.session_state.streeshield_chat_messages:
+    for message in st.session_state.ai_chat_history:
 
-        with st.chat_message(message["role"]):
+        with st.chat_message(
+            message["role"]
+        ):
 
-            st.write(
+            st.markdown(
                 message["content"]
             )
 
-    # ========================================================
-    # CHAT INPUT
-    # ========================================================
+
+    # ==================================================
+    # USER INPUT
+    # ==================================================
 
     question = st.chat_input(
-        "Ask STREESHIELD AI Assistant..."
+        "Ask STREESHIELD AI..."
     )
+
 
     if question:
 
-        # ----------------------------------------------------
-        # USER MESSAGE
-        # ----------------------------------------------------
+        # ----------------------------------------------
+        # SAVE USER MESSAGE
+        # ----------------------------------------------
 
-        st.session_state.streeshield_chat_messages.append(
-
+        st.session_state.ai_chat_history.append(
             {
                 "role": "user",
                 "content": question
             }
-
         )
 
-        with st.chat_message("user"):
 
-            st.write(question)
+        with st.chat_message(
+            "user"
+        ):
 
-        # ----------------------------------------------------
-        # ASSISTANT RESPONSE
-        # ----------------------------------------------------
+            st.markdown(
+                question
+            )
 
-        response = get_assistant_response(
-            question
-        )
 
-        st.session_state.streeshield_chat_messages.append(
+        # ----------------------------------------------
+        # BUILD DETECTION CONTEXT
+        # ----------------------------------------------
 
-            {
-                "role": "assistant",
-                "content": response
-            }
+        context = None
 
-        )
+        if detection_context:
 
-        with st.chat_message("assistant"):
+            context = (
+                f"Media type: "
+                f"{detection_context.get('media_type', 'N/A')}\n"
+                f"Model: "
+                f"{detection_context.get('model', 'N/A')}\n"
+                f"Prediction: "
+                f"{detection_context.get('prediction', 'N/A')}\n"
+                f"Confidence: "
+                f"{detection_context.get('confidence', 0):.2f}%\n"
+                f"Risk: "
+                f"{detection_context.get('risk', 'N/A')}\n"
+            )
 
-            st.write(response)
 
-    # ========================================================
-    # CLEAR CHAT
-    # ========================================================
+        # ----------------------------------------------
+        # AI RESPONSE
+        # ----------------------------------------------
 
-    if st.button(
-        "🗑️ Clear Assistant Chat",
-        key="clear_streeshield_chat"
-    ):
+        try:
 
-        st.session_state.streeshield_chat_messages = [
+            with st.chat_message(
+                "assistant"
+            ):
 
-            {
-                "role": "assistant",
-                "content": (
-                    "Chat cleared. 👋 "
-                    "Ask me a new question about STREESHIELD."
+                with st.spinner(
+                    "STREESHIELD AI is thinking..."
+                ):
+
+                    assistant = (
+                        OpenAISTREESHIELDAssistant()
+                    )
+
+                    answer = assistant.ask(
+                        question,
+                        detection_context=context
+                    )
+
+                st.markdown(
+                    answer
                 )
-            }
 
-        ]
 
-        st.rerun()
+            # ------------------------------------------
+            # SAVE AI RESPONSE
+            # ------------------------------------------
+
+            st.session_state.ai_chat_history.append(
+                {
+                    "role": "assistant",
+                    "content": answer
+                }
+            )
+
+
+        except Exception as error:
+
+            with st.chat_message(
+                "assistant"
+            ):
+
+                st.error(
+                    "The AI Assistant could not respond."
+                )
+
+                st.caption(
+                    str(error)
+                )
+
+
+    # ==================================================
+    # CLEAR CONVERSATION
+    # ==================================================
+
+    if st.session_state.ai_chat_history:
+
+        if st.button(
+            "🗑️ Clear Conversation",
+            key="clear_ai_chat"
+        ):
+
+            st.session_state.ai_chat_history = []
+
+            st.rerun()

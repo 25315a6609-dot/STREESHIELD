@@ -53,48 +53,42 @@ try:
     from video_processor import load_face_detector, process_video
 except ImportError as error:
     st.error("Could not load video preprocessing module.")
-    with st.expander("Technical details"):
-        st.code(str(error))
+    st.exception(error)
     st.stop()
 
 try:
     from ai_analyzer import STREESHIELDAnalyzer
 except ImportError as error:
     st.error("Could not load AI Analysis module.")
-    with st.expander("Technical details"):
-        st.code(str(error))
+    st.exception(error)
     st.stop()
 
 try:
     from ai_report import STREESHIELDReportGenerator
 except ImportError as error:
     st.error("Could not load AI Report module.")
-    with st.expander("Technical details"):
-        st.code(str(error))
+    st.exception(error)
     st.stop()
 
 try:
     from combined_report import STREESHIELDCombinedReport
 except ImportError as error:
     st.error("Could not load Combined Report module.")
-    with st.expander("Technical details"):
-        st.code(str(error))
+    st.exception(error)
     st.stop()
 
 try:
     from risk_assesment import STREESHIELDRiskAssessment
 except ImportError as error:
     st.error("Could not load Risk Assessment module.")
-    with st.expander("Technical details"):
-        st.code(str(error))
+    st.exception(error)
     st.stop()
 
 try:
     from chat_interface import render_chat
 except ImportError as error:
     st.error("Could not load AI Assistant module.")
-    with st.expander("Technical details"):
-        st.code(str(error))
+    st.exception(error)
     st.stop()
 
 
@@ -294,35 +288,6 @@ def format_prediction(probability):
     return "REAL", (1.0 - probability) * 100
 
 
-# ============================================================
-# AI EXPLANATION
-# ============================================================
-
-def generate_ai_explanation(
-    analyzer,
-    model_name,
-    prediction,
-    confidence,
-    media_type,
-):
-    """Convert the existing model result into the Phase 11 AI analysis."""
-
-    result = analyzer.analyze_prediction(
-        model_name=model_name,
-        prediction=prediction,
-        confidence=confidence,
-        media_type=media_type,
-    )
-
-    explanation = (
-        result.get("explanation", "")
-        + " "
-        + result.get("interpretation", "")
-    ).strip()
-
-    return explanation, result
-
-
 def preprocess_image(image_bytes, detector):
     image_array = np.frombuffer(image_bytes, dtype=np.uint8)
     image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
@@ -429,8 +394,7 @@ try:
         analyzer, report_generator, combined_report_generator, risk_assessment = load_ai_modules()
 except Exception as error:
     st.error("STREESHIELD could not initialize.")
-    with st.expander("Technical details"):
-        st.code(str(error))
+    st.exception(error)
     st.stop()
 
 
@@ -456,7 +420,7 @@ with summary1:
 with summary2:
     info_card("AI Layer", "Analysis + Assistant")
 with summary3:
-    if st.button("🔄 Reset", width="stretch"):
+    if st.button("🔄 Reset", use_container_width=True):
         reset_application()
         st.rerun()
 
@@ -511,7 +475,7 @@ with detection_tab:
                 st.image(
                     uploaded_image,
                     caption="Uploaded Image",
-                    width="stretch",
+                    use_container_width=True,
                 )
 
             with details:
@@ -600,8 +564,7 @@ with detection_tab:
 
             except Exception as error:
                 st.error("Image detection failed.")
-                with st.expander("Technical details"):
-                    st.code(str(error))
+                st.exception(error)
 
     # --------------------------------------------------------
     # VIDEO
@@ -714,8 +677,7 @@ with detection_tab:
                 st.warning(str(error))
             except Exception as error:
                 st.error("Video detection failed.")
-                with st.expander("Technical details"):
-                    st.code(str(error))
+                st.exception(error)
             finally:
                 if os.path.exists(temp_video_path):
                     try:
@@ -757,10 +719,10 @@ with analysis_tab:
         analysis_result = current["analysis_result"]
 
         st.markdown("### Confidence Interpretation")
-        st.write(analysis_result.get("confidence_level", "Not available"))
+        st.write(analysis_result["confidence_interpretation"])
 
         st.markdown("### Possible Indicators")
-        for indicator in analysis_result.get("possible_indicators", []):
+        for indicator in analysis_result["possible_indicators"]:
             st.write(f"✓ {indicator}")
 
         st.markdown("### Risk Assessment")
@@ -782,31 +744,18 @@ with analysis_tab:
 # ============================================================
 
 with assistant_tab:
-    st.subheader("🧠 STREESHIELD AI Assistant")
-    st.caption(
-        "Ask about your detection result, deepfakes, CNN, 3D CNN, OpenCV, confidence, or STREESHIELD."
-    )
-
+    # The chat component owns the assistant header, context,
+    # suggested questions, history, and input box. Keeping the
+    # tab itself minimal prevents duplicate UI sections.
     current = st.session_state.last_detection
+
+    detection_context = None
     if current is not None:
-        st.info(
-            f"Current detection: {current['prediction']} • "
-            f"{current['confidence']:.2f}% confidence • "
-            f"{current['model']} • {current['media_type']}"
-        )
+        detection_context = current
 
-    st.markdown("### Suggested questions")
-    q1, q2, q3, q4 = st.columns(4)
-    with q1:
-        st.button("What is CNN?", width="stretch", disabled=True)
-    with q2:
-        st.button("Why was it classified this way?", width="stretch", disabled=True)
-    with q3:
-        st.button("What does confidence mean?", width="stretch", disabled=True)
-    with q4:
-        st.button("How does 3D CNN work?", width="stretch", disabled=True)
-
-    render_chat()
+    render_chat(
+        detection_context=detection_context
+    )
 
 
 # ============================================================
@@ -850,7 +799,7 @@ with report_tab:
             data=current["report"],
             file_name="streesheild_detection_report.txt",
             mime="text/plain",
-            width="stretch",
+            use_container_width=True,
         )
 
         if (
@@ -887,7 +836,7 @@ with report_tab:
                     data=combined,
                     file_name="streesheild_combined_report.txt",
                     mime="text/plain",
-                    width="stretch",
+                    use_container_width=True,
                     key="combined_report_download",
                 )
             except Exception as error:
@@ -937,7 +886,7 @@ with about_tab:
             "3D CNN": ["50.00%", "50.00%", "100.00%", "66.67%", "47.00%"],
         },
         hide_index=True,
-        width="stretch",
+        use_container_width=True,
     )
 
     st.warning(
